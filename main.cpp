@@ -9,9 +9,6 @@
 #include <atlstr.h>
 #include <fstream>
 #include <cstdlib>
-//includes for the sleep timer
-#include <chrono>
-#include <thread>
 
 
 
@@ -22,7 +19,6 @@ public:
   TriMesh* Model;//Trimesh pointer to hold mesh data
   Cursor* deviceCursor;//Pointer to hold the cursor data
 };
-
 
 
 //declarations
@@ -39,10 +35,10 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    QHGLUT* DisplayObject = new QHGLUT(argc,argv);//create a display window
-    DeviceSpace* OmniSpace = new DeviceSpace;//Find the default Phantom Device
-    DisplayObject->tell(OmniSpace);//Tell QuickHaptics about it
-    DisplayObject->setBackgroundColor(0.8,0.65,0.4);
+  QHGLUT* DisplayObject = new QHGLUT(argc,argv);//create a display window
+  DeviceSpace* OmniSpace = new DeviceSpace;//Find the default Phantom Device
+  DisplayObject->tell(OmniSpace);//Tell QuickHaptics about it
+  DisplayObject->setBackgroundColor(0.8,0.65,0.4);
 
 
   TriMesh* room = new TriMesh("models/appleBasket/sphere_big.stl", 5.0, 5.0, 5.0, 5.0);
@@ -59,7 +55,6 @@ int main(int argc, char *argv[])
 
   //OmniSpace->touchCallback(callbackCursorTest, room);
 
-
 //startServoLoopCallback(void(HLCALLBACK *startServoLoopCallback)(HLcache *, void *), void(HLCALLBACK *MainServoLoopCallback)(HDdouble force[6], HLcache *, void *), void(HLCALLBACK *StopServoLoopCallback)(HLcache *, void *), void *userData)
 //This function defines the servoloop callback, The servoloop function will be invoked at the servo loop rate(1000 Hz)
   OmniSpace->startServoLoopCallback(startEffectCB, positonCB, stopEffectCB, &room);
@@ -71,27 +66,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-
-
 //int serial_port = open("\\\\.\\COM3", O_RDWR);
-
-void write_to_file(void) {
-
-  FILE * pFile;
-  pFile = fopen("\\\\.\\COM3", "w"); //open port to com 3 as file bc everything is a file in linux, w is for writing
-
-  if (pFile != NULL) 
-  {
-  cout << "port not open";
-  }
-//hduVector3Dd to_send = getPos();
-//cout << to_send[0];
-//serializeVectorTest(to_send);
-
-
-//fputs(to_send, pFile); // implicit cast to const char*
-}
-
 
 
 void printVec(hduVector3Dd position)
@@ -100,14 +75,10 @@ void printVec(hduVector3Dd position)
 }
 
 
-void serializeVectorTest(hduVector3Dd P_V) //hduVector3Dd P_V should be inside
-{
-// Create a Vector
+void writeToPort(hduVector3Dd P_V) 
   hduVector3Dd V = P_V;
-//V.set(1.5, 2.5, 3.5);
-// Cast it to an array of doubles and write it a file.
 
-  FILE* file = fopen("postions.txt", "w+"); // going to need to change to serial port as file type
+  FILE* file = fopen("\\\\.\\COM3", "w+"); // going to need to change to serial port as file type 
 
   if (file == NULL) 
   {
@@ -116,17 +87,59 @@ void serializeVectorTest(hduVector3Dd P_V) //hduVector3Dd P_V should be inside
     exit(1);
   }
 
-
   char textmsg[] = { "am i in the file" };
-  fwrite(textmsg, sizeof(char), sizeof(textmsg), file);
+
+  fwrite(textmsg, sizeof(char), sizeof(textmsg), file); // in theory this should be printed into the file a shit load of time
 
   fwrite((double*)(&V), sizeof(double), 3, file); // what is being written is not correct
 
   fclose(file);
 
   return;
-
 }
+
+//this is whats being called
+void serializeVectorTest(hduVector3Dd P_V) //hduVector3Dd P_V should be inside
+{
+  hduVector3Dd V = P_V;
+
+  FILE* file = fopen("postions.txt", "w+"); // going to need to change to serial port as file type
+
+
+  //file2 is for testing if it is the file type matters at all when writing 
+  FILE* file2 = fopen("postions.bin", "w+");
+
+  if (file == NULL) 
+  {
+    cerr << "Error: file not open!" << endl;
+    //std::cout << "file not open!";
+    exit(1);
+  }
+
+  if (file2 == NULL) 
+  {
+    cerr << "Error: file2 not open!" << endl;
+    //std::cout << "file not open!";
+    exit(1);
+  }
+
+  char textmsg[] = { "am i in the file" };
+
+  fwrite(textmsg, sizeof(char), sizeof(textmsg), file); // in theory this should be printed into the file a shit load of time
+
+  fwrite(textmsg, sizeof(char), sizeof(textmsg), file2);
+
+  fwrite((double*)(&V), sizeof(double), 3, file2); // what is being written is not correct
+
+  fwrite((double*)(&V), sizeof(double), 3, file); // what is being written is not correct
+
+  fclose(file);
+
+  fclose(file2);
+
+  return;
+}
+
 
 HDCallbackCode HDCALLBACK DevicePositionCallback(void *pUserData)
 {
@@ -138,7 +151,6 @@ HDCallbackCode HDCALLBACK DevicePositionCallback(void *pUserData)
 
   return HD_CALLBACK_DONE;
 }
-
 
 void PrintDevPos(void)
 {
@@ -154,8 +166,6 @@ void PrintDevPos(void)
   position[0], position[1], position[2]);
 }
 
-
-
 // Servo loop thread callback called when the effect is started.
 void HLCALLBACK startEffectCB(HLcache *cache, void *userdata)
 {
@@ -163,16 +173,54 @@ void HLCALLBACK startEffectCB(HLcache *cache, void *userdata)
   printf("Custom effect started\n");
 }
 
-
 // Servo loop thread callback called when the effect is stopped.
 void HLCALLBACK stopEffectCB(HLcache *cache, void *userdata)
 {
   printf("Custom effect stopped\n");
 }
 
-
-
+//this just defines what to do within the servoloop
+//i am simply just calling the callback to retreive and write the position of the cursor
 void HLCALLBACK positonCB(HDdouble force[3], HLcache *cache, void *userdata)
 {
   PrintDevPos();
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//this section of the file will be in ardunio and will not be included in this file in 
+
+
+double Byte1 = 0.0;   // for incoming serial data
+double Byte2 = 0.0;
+double Byte3 = 0.0;
+
+void setup() {
+  Serial.begin(9600);     // opens serial port, sets data rate to 9600 bps
+}
+
+void loop() 
+{
+
+  //add a sleep timer to only read in data every ~.5s 
+  Sleep(500); 
+
+  // send data only when you receive data:
+  if (Serial.available() > 0)
+  {
+  // read the incoming byte:
+  Byte1 = Serial.read();
+  Byte2 = Serial.read();
+  Byte3 = Serial.read();
+  double  curPos[3] = [Byte1, Byte2, Byte3]; 
+
+
+  //this is just used for testing if the vector is indeed correct
+  for(int i = 0; i < 3; i++)
+  {
+    Serial.println(myArray[i]);
+  }
+
+  }
+}
+
