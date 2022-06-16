@@ -1,6 +1,8 @@
 //Griffin Heyrich
 //BU_MBL 6/2022
-//the function of this set of code is to utilize the pyfirmata class to read in from file where coordinates are being sent and send them to each individual lcd board
+//the function of this set of code is to utilize the pyfirmata class to read in from file where coordinates
+//are being sent and send them to each individual lcd board, as well as being mapped to the appropriate volume
+//to be pumped into the chanmbers of our robot to create movement. 
 
 #include <LiquidCrystal.h>
 #include <Firmata.h>
