@@ -4,6 +4,7 @@
 
 #include <LiquidCrystal.h>
 #include <Firmata.h>
+#include <math.h>
 
 const int rs = 12, en1 = 11, d4 = 6, d5 = 5, d6 = 4, d7 = 3;
 LiquidCrystal lcd(rs, en1, d4, d5, d6, d7);
@@ -14,10 +15,22 @@ LiquidCrystal lcd2(rs, en2, d4, d5, d6, d7);
 const int en3 = 9;
 LiquidCrystal lcd3(rs, en3, d4, d5, d6, d7); 
 
-String pos1 = "";
-String pos2 = "";
-String pos3 = "";
+//omni device coordinates 
+String posX = ""; String posY = ""; String posZ = "";
 
+// abg coordinates "basis" vectors
+float a1 = 0; float a2 = 1;
+float b1 = -0.866; float b2 = -0.5;
+float c1 = 0.866; float c2 = -0.5;
+
+// Nunchuck position in abg coordinates
+float alphaCoord = 0; float betaCoord = 0; float gammaCoord = 0;
+
+// Overall level
+float alphaLevel = 0; float betaLevel = 0; float gammaLevel = 0; 
+
+// Chamber volume values
+float alphaVol = 0; float betaVol = 0; float gammaVol = 0;
 
 void setup() 
 {
@@ -52,9 +65,9 @@ void stringDataCallback(char* strdata)
   lcd2.clear();
   lcd3.clear();
   
-  lcd.print("pos1: ");
-  lcd2.print("pos2: "); 
-  lcd3.print("pos3: ");
+  lcd.print("posX: ");
+  lcd2.print("posY: "); 
+  lcd3.print("posZ: ");
   
   lcd.setCursor(0,1);
   lcd2.setCursor(0,1);
@@ -64,13 +77,40 @@ void stringDataCallback(char* strdata)
   lcd3.blink();
   
   processStr(strdata); //send to process string to break into each coordinate
-  
-  lcd.print(pos1);
-  lcd2.print(pos2);
-  lcd3.print(pos3);
 
+  lcd.print(posX);
+  lcd2.print(posY);
+  lcd3.print(posZ);
+ 
+  posX.toFloat(); 
+  posY.toFloat(); 
+  posZ.toFloat();
+ 
+  alphaCoord = posY;
+  betaCoord = (posX * b1) + (posY * b2);
+  gammaCoord = (posX * c1) + (posY * c2);
+ 
+
+  //in jacobs code he uses if statements to verify that if he gets the postion of the wii nunchunk these 
+  //i just do it here bc at this point ik i have succesfully gotten the position, not sure if needed though
+  alphaLevel ++, alphaLevel ++;
+  betaLevel ++, betaLevel ++;
+  gammaLevel ++, gammaLevel ++;
+ 
+  alphaVol = alphaLevel + (50*alphaCoord/128);
+  betaVol = betaLevel + (50*betaCoord/175);
+  gammaVol = gammaLevel + (50*gammaCoord/175);
+
+  //Constrain volume values from 0 to 100
+  alphaVol = constrain(alphaVol, 0, 100);
+  betaVol = constrain(betaVol, 0, 100);
+  gammaVol = constrain(gammaVol, 0, 100);
+ 
+  analogWrite(3,alphaVol);
+  analogWrite(5,betaVol);
+  analogWrite(6,gammaVol);
+ 
 }
-
 
 void processStr(char* strdata)
 {
