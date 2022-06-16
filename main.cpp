@@ -1,9 +1,14 @@
 //Griffin Heyrich
 //Hapctic Device Controller
 //MBL_BU, Boston, MA
-//the function of this block of 
+//This is the C++ code that creates and launches the user interface using the quickhaptics api. 
+//A servoloop callback is used to get the call get the positon vector of the cursor. 
+//The positon vector is processed and broken down into its components and sent to "position1.txt", 
+//this is cleared each time before being appended to in order so that only 3 values at a time will be in the file for reading.
 
-#include <QHHeadersGLUT.h>//Include all necessary headers
+
+//Include all necessary headers
+#include <QHHeadersGLUT.h>
 #include <string>
 #include <stdio.h>
 #include <iostream>
@@ -13,8 +18,8 @@
 #include <time.h>
 #include "SimpleSerial.h"
 
-
-class DataTransportClass//This class carried data into the ServoLoop thread
+//This class carried data into the ServoLoop thread
+class DataTransportClass
 {
 public:
 	TriMesh* Model;//Trimesh pointer to hold mesh data
@@ -35,7 +40,8 @@ using namespace std;
 //time1 is a global variable
 time_t time1 = time(NULL);
 
-
+//intialize the haptic device and set up user face for rendering. begin servo loop to get cursor positon
+//on start up clear the old file 
 int main(int argc, char *argv[])
 {
     QHGLUT* DisplayObject = new QHGLUT(argc,argv);//create a display window
@@ -73,21 +79,21 @@ void printVec(hduVector3Dd position)
 	printf("Device position: %.3f %.3f %.3f\n", position[0], position[1], position[2]); 
 }
 
-
-void writePos2File(hduVector3Dd P_V) //hduVector3Dd P_V should be inside
+//if longer than .1 seconds has past the file is cleared and each position is appended
+void writePos2File(hduVector3Dd P_V)
 {
-
 	time_t time2 = time(NULL);
 	auto sec = difftime(time2, time1);
 
-	if (sec >= .1) // if it has been greater than .5 send position to file for py to read and send to ardunio
+	if (sec >= .1) // if it has been greater than .1 sec send position to file for py to read and send to ardunio
 	{
 		// Create a Vector
 		hduVector3Dd V = P_V;
 		
 		std::ofstream clear; //this is just clearing the contents of the file prior to the write, so I only should have 3 elemets in my file at a time
 		clear.open("positions1.txt", std::ofstream::out | std::ofstream::trunc);
-
+		
+		//open file and write coordinate to a newline
 		ofstream myfile("positions1.txt", std::ofstream::app);
 		if (myfile.is_open())
 		{
@@ -98,7 +104,7 @@ void writePos2File(hduVector3Dd P_V) //hduVector3Dd P_V should be inside
 		}
 		else
 		{
-			cerr << "Error: file not open here!" << endl;
+			cerr << "Error: file not open here!" << endl; 
 			exit(1);
 		}
 
@@ -126,7 +132,7 @@ void file_verify(void)
 	printf("%f, %f, %f \n", V2[0], V2[1], V2[2]);
 }
 
-
+//defines the callback on the device to get the postion at the rate of the servoloop ~1000 hz 
 HDCallbackCode HDCALLBACK DevicePositionCallback(void *pUserData)
 {
 	HDdouble *pPosition = (HDdouble *)pUserData;
@@ -138,7 +144,7 @@ HDCallbackCode HDCALLBACK DevicePositionCallback(void *pUserData)
 	return HD_CALLBACK_DONE;
 }
 
-//thihs sends the position to function to send to file then prints the device position 
+//this sends the position to writePos2Filefunction to send to file then prints the device position 
 void sendDevPos(void)
 {
 	hduVector3Dd position;
