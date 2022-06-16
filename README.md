@@ -12,3 +12,4 @@ This is the C++ code that creates and launches the user interface using the quic
 
 This python code is used due to the inability to open the serial communciaton port on two console apps at the same time, resulting in the usage of the before mentioned file technique. This file uses pyfirmata to communicate with the arduino, reading in each position and sending it to the ardiuno for processesing by the pumps and being displayed by the lcd screen. 
 
+#### ldek
