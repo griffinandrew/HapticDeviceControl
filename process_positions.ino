@@ -20,6 +20,9 @@ LiquidCrystal lcd3(rs, en3, d4, d5, d6, d7);
 //omni device coordinates 
 String posX = ""; String posY = ""; String posZ = "";
 
+//omni device coordinates after converted to double
+float pos_X = 0.0; float pos_Y = 0.0; float pos_Z = 0.0;
+
 // abg coordinates "basis" vectors
 float a1 = 0; float a2 = 1;
 float b1 = -0.866; float b2 = -0.5;
@@ -84,13 +87,21 @@ void stringDataCallback(char* strdata)
   lcd2.print(posY);
   lcd3.print(posZ);
  
-  posX.toFloat(); 
-  posY.toFloat(); 
-  posZ.toFloat();
+  //posX.toFloat(); 
+  //posY.toFloat(); 
+  //posZ.toFloat();
+  char*Xstr = &posX[0];
+  char*Ystr = &posY[0];
+  char*Zstr = &posZ[0];
+
+  pos_X = atof(Xstr);
+  pos_Y = atof(Ystr) ;
+  pos_Z = atof(Zstr);
+
  
-  alphaCoord = posY;
-  betaCoord = (posX * b1) + (posY * b2);
-  gammaCoord = (posX * c1) + (posY * c2);
+  alphaCoord = pos_Y;
+  betaCoord = (pos_X * b1) + (pos_Y * b2);
+  gammaCoord = (pos_X * c1) + (pos_Y * c2);
  
 
   //in jacobs code he uses if statements to verify that if he gets the postion of the wii nunchunk these 
@@ -119,9 +130,9 @@ void processStr(char* strdata)
 
   int num_space = 0;
   String str(strdata);
-  pos1 = "";
-  pos2 = "";
-  pos3 = ""; // reset the string to empty at the beginning of the loo[p
+  posX = "";
+  posY = "";
+  posZ = ""; // reset the string to empty at the beginning of the loo[p
   
   for (int i = 0; i < str.length(); i++)  
   {
@@ -136,15 +147,15 @@ void processStr(char* strdata)
     
     if (!(isspace(str[i])) && num_space == 0) //x
     {
-      pos1 += str[i];
+      posX += str[i];
     }
     if (!(isspace(str[i])) && num_space == 1)  //y 
     {
-      pos2 +=str[i];
+      posY +=str[i];
     }
     if (!(isspace(str[i])) && num_space == 2) //z
     {
-      pos3 +=str[i];
+      posZ +=str[i];
     }
   }
 }
