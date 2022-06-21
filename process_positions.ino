@@ -31,9 +31,6 @@ float c1 = 0.866; float c2 = -0.5;
 // Nunchuck position in abg coordinates
 float alphaCoord = 0; float betaCoord = 0; float gammaCoord = 0;
 
-// Overall level
-float alphaLevel = 0; float betaLevel = 0; float gammaLevel = 0; 
-
 // Chamber volume values
 float alphaVol = 0; float betaVol = 0; float gammaVol = 0;
 
@@ -55,7 +52,7 @@ void setup()
 
 void loop() 
 {
-  delay(100); //not surte if needed or not need to test
+  delay(100);
   while(Firmata.available() )
   {
     Firmata.processInput(); // this sends incoming data to callback function
@@ -70,56 +67,51 @@ void stringDataCallback(char* strdata)
   lcd2.clear();
   lcd3.clear();
   
-  lcd.print("posX: ");
-  lcd2.print("posY: "); 
-  lcd3.print("posZ: ");
+  lcd.print("vol X: ");
+  lcd2.print("vol Y: "); 
+  lcd3.print("vol Z: ");
   
   lcd.setCursor(0,1);
   lcd2.setCursor(0,1);
   lcd3.setCursor(0,1);
-  lcd.blink();
-  lcd2.blink();
-  lcd3.blink();
   
   processStr(strdata); //send to process string to break into each coordinate
 
-  lcd.print(posX);
-  lcd2.print(posY);
-  lcd3.print(posZ);
- 
-  //posX.toFloat(); 
-  //posY.toFloat(); 
-  //posZ.toFloat();
+  //need to convert to char* before using atof()
   char*Xstr = &posX[0];
   char*Ystr = &posY[0];
   char*Zstr = &posZ[0];
 
+  //converting char* to float
   pos_X = atof(Xstr);
-  pos_Y = atof(Ystr) ;
-  pos_Z = atof(Zstr);
-
+  pos_Y = atof(Ystr) + 65.511 ; // bascailly  i am adjusting for the origin
+  pos_Z = atof(Zstr) + 88.114; // note in jacobs he is subtracting the origin here i am adding
+  
  
   alphaCoord = pos_Y;
   betaCoord = (pos_X * b1) + (pos_Y * b2);
   gammaCoord = (pos_X * c1) + (pos_Y * c2);
- 
 
-  //in jacobs code he uses if statements to verify that if he gets the postion of the wii nunchunk these 
-  //i just do it here bc at this point ik i have succesfully gotten the position, not sure if needed though
-  alphaLevel ++, alphaLevel ++;
-  betaLevel ++, betaLevel ++;
-  gammaLevel ++, gammaLevel ++;
- 
-  alphaVol = alphaLevel + (50*alphaCoord/128);
-  betaVol = betaLevel + (50*betaCoord/175);
-  gammaVol = gammaLevel + (50*gammaCoord/175);
+  //map the coordinate system to the appropriate volume 
+  alphaVol = pos_Z + (312*alphaCoord/440); 
+  betaVol = pos_Z + (312*betaCoord/440);
+  gammaVol = pos_Z + (312*gammaCoord/440);
+
+  //invert coordinates
+  alphaCoord = -alphaCoord;
+  betaCoord = -betaCoord;
+  gammaCoord = -gammaCoord;
 
   //Constrain volume values from 0 to 100
   alphaVol = constrain(alphaVol, 0, 100);
   betaVol = constrain(betaVol, 0, 100);
   gammaVol = constrain(gammaVol, 0, 100);
+
+  lcd.print(alphaVol);
+  lcd2.print(betaVol);
+  lcd3.print(gammaVol);
  
-  analogWrite(3,alphaVol);
+  analogWrite(3,alphaVol); // pin values will be different 
   analogWrite(5,betaVol);
   analogWrite(6,gammaVol);
  
