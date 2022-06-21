@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
     DisplayObject->tell(OmniSpace);//Tell QuickHaptics about it
     DisplayObject->setBackgroundColor(0.8,0.65,0.4);
 
-	TriMesh* room = new TriMesh("models/appleBasket/sphere_big.stl", 5.0, 5.0, 5.0, 5.0);
-	room->setTexture("models/appleBasket/wood.jpg");
-	room->setUnDraggable();
-	DisplayObject->tell(room);
+	//TriMesh* room = new TriMesh("models/appleBasket/sphere_big.stl", 5.0, 5.0, 5.0, 5.0);
+	//room->setTexture("models/appleBasket/wood.jpg");
+	//room->setUnDraggable();
+	//DisplayObject->tell(room);
 
 	Cursor* OmniCursor = new Cursor("models/appleBasket/pencil.3DS");//Declare a new cursor
 	OmniCursor->scaleCursor(0.001);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 	DisplayObject->tell(OmniCursor);//tell QuickHaptics about the cursor
 
 	//This function defines the servoloop callback, The servoloop function will be invoked at the servo loop rate(1000 Hz)
-	OmniSpace->startServoLoopCallback(startEffectCB, positonCB, stopEffectCB, &room);
+	OmniSpace->startServoLoopCallback(startEffectCB, positonCB, stopEffectCB, &DisplayObject);
 
 	//clear the old positions 
 	std::ofstream OFS;
