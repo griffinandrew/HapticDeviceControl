@@ -2,6 +2,9 @@ import time
 import pyfirmata
 from pyfirmata import Arduino, util, STRING_DATA
 
+import subprocess
+
+board = pyfirmata.Arduino("COM3")
 
 def read_file(): 
     #open the file and write to arduino
@@ -20,5 +23,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    board = pyfirmata.Arduino('COM3')
     print("connection success")
