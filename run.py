@@ -1,3 +1,9 @@
+#Griffin Heyrich
+#June 2022
+#BU_MBL
+#the purpose of this segment of code is to get rid of the need to run both main.cpp and file_2_ardiuno.py from each respective enviornment and instead
+#have just one script that activates both with 1 click
+
 import subprocess
 import multiprocessing 
 from multiprocessing import Pool
