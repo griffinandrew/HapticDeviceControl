@@ -1,8 +1,9 @@
 import subprocess
-
 import multiprocessing 
 from multiprocessing import Pool
 import os 
+
+
 
 haptic = ("C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe")
 
@@ -11,7 +12,7 @@ f2p= ("//ad/eng/users/g/h/gheyrich/Desktop/file_to_arduino.py")
 
 def run():
     #p1 = subprocess.Popen(["C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe"])
-    p2 = subprocess.run("//ad/eng/users/g/h/gheyrich/Desktop/file_to_arduino.py & C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe", shell = True)
+    p2 = subprocess.Popen("//ad/eng/users/g/h/gheyrich/Desktop/file_to_arduino.py & C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe")
 
    # subprocess.run("python3 fi.py & python3 script2.py", shell=True)
 
