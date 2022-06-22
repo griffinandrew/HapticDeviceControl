@@ -15,3 +15,8 @@ This python code is used due to the inability to open the serial communciaton po
 ### process_positions.ino
 
 This file uses the firmata class to receive the positions being sent to the arduino. The position is translated using abg coordinates to abg volume levels that are then pumped into the robot.
+
+
+### run.py
+the purpose of this segment of code is to get rid of the need to run both main.cpp and file_2_ardiuno.py from each respective enviornment and instead
+have just one script that activates both with 1 click
