@@ -9,7 +9,8 @@ import multiprocessing
 from multiprocessing import Pool
 import os 
 import threading 
-
+import file2arduino
+ 
 
 haptic = ("C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe")
 
@@ -33,25 +34,29 @@ def run_mult_proc():
         p2 = multiprocessing.Process(target=exec2, args=())    
 
         p1.start()
-        p2.start()
+        #p2.start()
         
         
- def exec1():
+def exec1():
     os.system("//ad/eng/users/g/h/gheyrich/Desktop/file_to_arduino.py")
     
- def exec2():
+def exec2():
     os.system("C:\\OpenHaptics\\Developer\\3.5.0\\Quickhaptics\\examples\\Debug\\pickApplesGLUT.exe")
     
 def run_thread():
-    t1 = threading.Thread(target=exe1, args=()) 
-    t2 = threading.Thread(target=exe2, args=()) 
+    t1 = threading.Thread(target=exec1, args=()) 
+    t2 = threading.Thread(target=exec2, args=()) 
     t1.start()
-    t2.start() 
+    #t2.start() 
+
+
+def run_module():
+    t1 = threading.Thread(target=)
+    file2arduino.main()
+    exec2()
     
 
 if __name__ == '__main__':
-    run_thread()
+    #run_thread()
     #run_mult_proc()
-
-    
-    
+    run_module()
