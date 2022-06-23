@@ -34,6 +34,9 @@ float alphaCoord = 0; float betaCoord = 0; float gammaCoord = 0;
 // Chamber volume values
 float alphaVol = 0; float betaVol = 0; float gammaVol = 0;
 
+//chamber levels 
+float alphaLevel =0.0; float betaLevel = 0.0; float gammaLevel = 0.0; 
+
 void setup() 
 {
   Serial.begin(9600);
@@ -62,14 +65,13 @@ void loop()
 
 void stringDataCallback(char* strdata)
 {
-  
   lcd.clear();
   lcd2.clear();
   lcd3.clear();
   
-  lcd.print("vol X: ");
-  lcd2.print("vol Y: "); 
-  lcd3.print("vol Z: ");
+  lcd.print("alpha: ");
+  lcd2.print("beta: "); 
+  lcd3.print("gamma: ");
   
   lcd.setCursor(0,1);
   lcd2.setCursor(0,1);
@@ -85,22 +87,25 @@ void stringDataCallback(char* strdata)
   //converting char* to float
   pos_X = atof(Xstr);
   pos_Y = atof(Ystr) + 65.511 ; // bascailly  i am adjusting for the origin
-  pos_Z = atof(Zstr) + 88.114; // note in jacobs he is subtracting the origin here i am adding
+  pos_Z = atof(Zstr) - 10; // note in jacobs he is subtracting the origin here i am adding
   
- 
-  alphaCoord = pos_Y;
-  betaCoord = (pos_X * b1) + (pos_Y * b2);
-  gammaCoord = (pos_X * c1) + (pos_Y * c2);
-
-  //map the coordinate system to the appropriate volume 
-  alphaVol = pos_Z + (312*alphaCoord/440); 
-  betaVol = pos_Z + (312*betaCoord/440);
-  gammaVol = pos_Z + (312*gammaCoord/440);
+  alphaCoord = pos_Z;
+  betaCoord = (pos_X * b1) + (pos_Z * b2);
+  gammaCoord = (pos_X * c1) + (pos_Z * c2);
 
   //invert coordinates
   alphaCoord = -alphaCoord;
   betaCoord = -betaCoord;
   gammaCoord = -gammaCoord;
+
+  alphaLevel = .3367* pos_Y;
+  betaLevel = .3367* pos_Y;
+  gammaLevel = .3367* pos_Y;
+  
+  //map the coordinate system to the appropriate volume 
+  alphaVol = alphaLevel + (100*alphaCoord/180); 
+  betaVol = betaLevel + (100*betaCoord/220);
+  gammaVol = gammaLevel + (100*gammaCoord/220);
 
   //Constrain volume values from 0 to 100
   alphaVol = constrain(alphaVol, 0, 100);
