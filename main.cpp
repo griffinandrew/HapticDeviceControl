@@ -38,16 +38,16 @@ using namespace std;
 
 
 //time1 is a global variable
-time_t time1 = time(NULL);
+//time_t time1 = time(NULL);
 
 //intialize the haptic device and set up user face for rendering. begin servo loop to get cursor positon
 //on start up clear the old file 
 int main(int argc, char *argv[])
 {
-    QHGLUT* DisplayObject = new QHGLUT(argc,argv);//create a display window
-    DeviceSpace* OmniSpace = new DeviceSpace;//Find the default Phantom Device
-    DisplayObject->tell(OmniSpace);//Tell QuickHaptics about it
-    DisplayObject->setBackgroundColor(0.8,0.65,0.4);
+	QHGLUT* DisplayObject = new QHGLUT(argc, argv);//create a display window
+	DeviceSpace* OmniSpace = new DeviceSpace;//Find the default Phantom Device
+	DisplayObject->tell(OmniSpace);//Tell QuickHaptics about it
+	DisplayObject->setBackgroundColor(0.8, 0.65, 0.4);
 
 	//TriMesh* room = new TriMesh("models/appleBasket/sphere_big.stl", 5.0, 5.0, 5.0, 5.0);
 	//room->setTexture("models/appleBasket/wood.jpg");
@@ -69,53 +69,42 @@ int main(int argc, char *argv[])
 	OFS.close();
 
 	//Set everything in motion 
-    qhStart(); 
+	qhStart();
 
-    return 0;
+	return 0;
 }
 
 void printVec(hduVector3Dd position)
 {
-	printf("Device position: %.3f %.3f %.3f\n", position[0], position[1], position[2]); 
+	printf("Device position: %.3f %.3f %.3f\n", position[0], position[1], position[2]);
 }
 
-//if longer than .1 seconds has past the file is cleared and each position is appended
+//write 3 vector pos's to cleared file so that there is only 3 lines to read in the code
 void writePos2File(hduVector3Dd P_V)
 {
-	time_t time2 = time(NULL);
-	auto sec = difftime(time2, time1);
+	hduVector3Dd V = P_V;
 
-	if (sec >= .1) // if it has been greater than .1 sec send position to file for py to read and send to ardunio
+	std::ofstream clear; //this is just clearing the contents of the file prior to the write, so I only should have 3 elemets in my file at a time
+	clear.open("positions1.txt", std::ofstream::out | std::ofstream::trunc);
+
+	//open file and write coordinate to a newline
+	ofstream myfile("positions1.txt", std::ofstream::app);
+	if (myfile.is_open())
 	{
-		// Create a Vector
-		hduVector3Dd V = P_V;
-		
-		std::ofstream clear; //this is just clearing the contents of the file prior to the write, so I only should have 3 elemets in my file at a time
-		clear.open("positions1.txt", std::ofstream::out | std::ofstream::trunc);
-		
-		//open file and write coordinate to a newline
-		ofstream myfile("positions1.txt", std::ofstream::app);
-		if (myfile.is_open())
-		{
-			myfile << V[0] << '\n';
-			myfile << V[1] << '\n';
-			myfile << V[2] << '\n';
-			myfile.close();
-		}
-		else
-		{
-			cerr << "Error: file not open here!" << endl; 
-			exit(1);
-		}
-
+		myfile << V[0] << '\n';
+		myfile << V[1] << '\n';
+		myfile << V[2] << '\n';
 		myfile.close();
-
-		time1 = time(NULL); //reset the clock again after pos sent 
-
 	}
+	else
+	{
+		cerr << "Error: file not open here!" << endl;
+		exit(1);
+	}
+
+	myfile.close();
 	return;
 }
-
 
 //verifies that what is being sent (USED FOR TESTING)
 void file_verify(void)
@@ -149,12 +138,10 @@ void sendDevPos(void)
 {
 	hduVector3Dd position;
 
-	hdScheduleSynchronous(DevicePositionCallback, position,HD_DEFAULT_SCHEDULER_PRIORITY);
+	hdScheduleSynchronous(DevicePositionCallback, position, HD_DEFAULT_SCHEDULER_PRIORITY);
 
 	writePos2File(position);
 
-    printf("Device position: %.3f %.3f %.3f\n",
-	position[0], position[1], position[2]);
 }
 
 
