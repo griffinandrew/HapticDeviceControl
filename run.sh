@@ -1,12 +1,9 @@
 #!/bin/bash
 
-python3 -m pip install time
-python3 -m pip install pyfirmata
+python3 -c "import time, pyfirmata, code; code.interact(local=locals())" // ng
 
-python3 -c "import time, pyfirmata, code; code.interact(local=locals())"
-
-mnt/c/OpenHaptics/Developer/3.5.0/Quickhaptics/examples/Debug/file_to_arduino.py &
-mnt/c/OpenHaptics/Developer/3.5.0/Quickhaptics/examples/Debug/pickApplesGLUT.exe && fg
+/mnt/c/OpenHaptics/Developer/3.5.0/Quickhaptics/examples/Debug/file_to_arduino.py &
+/mnt/c/OpenHaptics/Developer/3.5.0/Quickhaptics/examples/Debug/pickApplesGLUT.exe && fg
 
 #!/bin/python
 import time
