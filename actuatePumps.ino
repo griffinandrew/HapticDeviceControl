@@ -40,7 +40,7 @@ void setup()
 
 void loop() 
 {
-  delay(100);
+  //delay(100);
   while(Firmata.available() )
   {
     Firmata.processInput(); // this sends incoming data to callback function
@@ -86,9 +86,9 @@ void stringDataCallback(char* strdata)
   betaVol = constrain(betaVol, 0, 100);
   gammaVol = constrain(gammaVol, 0, 100);
 
-  analogWrite(3,alphaVol);
-  analogWrite(5,betaVol);
-  analogWrite(6,gammaVol);
+  analogWrite(3,ceil(alphaVol));
+  analogWrite(5,ceil(betaVol));
+  analogWrite(6,ceil(gammaVol));
 }
 
 
