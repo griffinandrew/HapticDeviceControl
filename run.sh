@@ -21,3 +21,9 @@ import pyfirmata
 #https://stackoverflow.com/questions/32093559/exe-file-created-by-pyinstaller-not-find-self-defined-modules-while-running?answertab=trending#tab-top
 #
 #basically the internet is saying need to specify paths of the included modules
+
+
+pyi-makespec --paths=/path/to/thisdir \
+             --paths=/path/to/otherdir myscript.py
+             
+pyi_makespec --paths =
