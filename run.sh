@@ -27,3 +27,7 @@ pyi-makespec --paths=/path/to/thisdir \
              --paths=/path/to/otherdir myscript.py
              
 pyi_makespec --paths =
+
+
+
+pyinstaller --noconfirm --onedir --console --add-data "/Users/gheyrich/Documents/Hw 9 ma581 use this one.pdf:." --add-data "/Users/gheyrich/Documents/ma213 hw 6.pdf:."  "/Users/gheyrich/Documents/HW 8 MA581.pdf"
